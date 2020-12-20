@@ -11,13 +11,6 @@ function App() {
   const [ inputValue, setInputValue ] = useState("0");
   const [ calValue, setCalValue ] = useState(0);
   const [ isResult, setIsResult ] = useState(false);
-  // const [ isNextValue, setIsNextValue ] = useState(false);
-
-  // useEffect(() => {
-  //   console.log(displayFormula);
-  // });
-
-  // useEffect: document.addEventListener("keydown", ..);
 
   // regular expressions methods accept strings as parameters.
 
@@ -29,36 +22,46 @@ function App() {
   // $: the end of input
   // ^: the start of input
 
-  const endWithZeroAfterDecimal = /\.\d*?(0*)$/;
-  const beginWithNegativeSign = /^-?\d*\.?/;
-  const formulaHasOperator = /\d*([\*\/\+\-\=])\d*/;
+  const beginWithNegativeSign = /^-\d*\.?/;
+  const formulaHasOperator = /\d+([\*\/\+\-\=])\d*/;
+  const formulaEndWithOperator = /[\*\/\+\-]$/;
 
   // perform operations
   const handleCalculation = (event, oper) => {
     event.preventDefault();
-    const match = resultFormula.match(formulaHasOperator);
+    handleClearInput();
     const nextValue = parseFloat(inputValue);
-    console.log(match);
     let newCalValue = parseFloat(calValue);
-    if (match) {
-      switch (match[1]) {
-        case "+":
-          newCalValue += nextValue;
-          break;
-        case "-":
-          newCalValue -= nextValue;
-          break;
-        case "*":
-          newCalValue *= nextValue;
-          break;
-        case "/":
-          newCalValue /= nextValue;
-          break;
-        default:
-          return newCalValue;
-      }
+    let match = "";
 
-      // get a result
+    // if before the operator, there is a operator, check if the operator is a negative sign or needs to replace the previous one
+    if (formulaEndWithOperator.test(resultFormula) | resultFormula === "") {
+      console.log("multiple operators testing...");
+      if (oper === "-") {
+        setInputValue("-");
+        handleFormula(oper);
+        handleResultFormula(oper);
+        if (resultFormula === "") {
+          setResultFormula("0+-");
+        }
+      } else {
+        let newDisplayFormula = displayFormula;
+        let newResultFormula = resultFormula;
+        while (formulaEndWithOperator.test(newDisplayFormula)) {
+          newDisplayFormula = newDisplayFormula.slice(0, newDisplayFormula.length - 1);
+          newResultFormula = newResultFormula.slice(0, newResultFormula.length - 1);
+        }
+        newDisplayFormula += oper;
+        newResultFormula += oper;
+        setDisplayFormula(newDisplayFormula);
+        setResultFormula(newResultFormula);
+      } 
+    } else if (beginWithNegativeSign.test(nextValue)) {
+      console.log("testing...");
+      const negativeSignIndex = resultFormula.indexOf(nextValue);
+      match = resultFormula[negativeSignIndex - 1];
+      newCalValue = performCal(match, newCalValue, nextValue);
+
       if (oper === "=") {
         setIsResult(true);
         handleFormula(`=${newCalValue}`);
@@ -66,15 +69,52 @@ function App() {
       } else {
         handleFormula(oper);
         handleResultFormula(newCalValue, oper, true);
-      }
+      }  
       setCalValue(newCalValue);
+
     } else {
-      newCalValue = inputValue;
-      setCalValue(newCalValue);
-      handleFormula(oper);
-      handleResultFormula(oper);
+      match = resultFormula.match(formulaHasOperator);
+      console.log(match);
+
+      if (match) {
+        newCalValue = performCal(match[1], newCalValue, nextValue);
+        // get a result
+        if (oper === "=") {
+          setIsResult(true);
+          handleFormula(`=${newCalValue}`);
+          handleResultFormula(`=${newCalValue}`);
+        } else {
+          handleFormula(oper);
+          handleResultFormula(newCalValue, oper, true);
+        }  
+        setCalValue(newCalValue);
+      } else {
+        newCalValue = inputValue;
+        setCalValue(newCalValue);
+        handleFormula(oper);
+        handleResultFormula(oper);
+      }
+    }    
+  }
+
+  const performCal = (oper, calValue, nextValue) => {
+    switch(oper) {
+      case "+": 
+        calValue += nextValue;
+        break;
+      case "-":
+        calValue -= nextValue;
+        break;
+      case "*":
+        calValue *= nextValue;
+        break;
+      case "/":
+        calValue /= nextValue;
+        break;
+      default:
+        return calValue;
     }
-    handleClearInput();
+    return calValue;
   }
 
   // update the input value
@@ -89,6 +129,14 @@ function App() {
     handleFormula(newInputValue);
     setInputValue(newInputValue);
     handleResultFormula(newInputValue);
+  }
+
+  const handleDecimal = (event) => {
+    event.preventDefault();
+    let newInputValue = inputValue;
+    if (!newInputValue.includes(".")) {
+      handleInput(event, ".")
+    } 
   }
 
   // update formula with the new added numbers or operators
@@ -106,6 +154,7 @@ function App() {
 
   const handleResultFormula = (numOrOper, oper = null, isCalValue = false) => {
     let newResultFormula = resultFormula;
+    console.log(newResultFormula);
     if (isCalValue) {
       newResultFormula = numOrOper + oper;
     } else if (numOrOper.startsWith("=")) {
@@ -149,7 +198,7 @@ function App() {
       <div className="numButtons"> 
         { numbers.map( num => 
           <button 
-            id={num.button}
+            id={num.id}
             onClick = {(event) => handleInput(event, num.number)}
           > 
             {num.number} 
@@ -166,7 +215,12 @@ function App() {
         }
       </div>
       <div>
-        <button id="decimal">.</button>
+        <button 
+          id="decimal" 
+          onClick={handleDecimal}
+        >
+          .
+        </button>
       </div>
       <div>
         <button id="clear" onClick={handleClear}>C</button>
