@@ -7,6 +7,7 @@ import './App.css';
 function App() {
 
   const [ displayFormula, setDisplayFormula ] = useState("0");
+  const [ resultFormula, setResultFormula ] = useState("");
   const [ inputValue, setInputValue ] = useState("0");
   const [ calValue, setCalValue ] = useState(0);
   const [ isResult, setIsResult ] = useState(false);
@@ -30,16 +31,17 @@ function App() {
 
   const endWithZeroAfterDecimal = /\.\d*?(0*)$/;
   const beginWithNegativeSign = /^-?\d*\.?/;
-  const endWithOperator = /[*/+-=]$/;
+  const formulaHasOperator = /\d*([\*\/\+\-\=])\d*/;
 
   // perform operations
   const handleCalculation = (event, oper) => {
     event.preventDefault();
-    console.log(endWithOperator.test(displayFormula));
-    if (endWithOperator.test(displayFormula)) {
-      const nextValue = parseFloat(inputValue);
-      let newCalValue = calValue;
-      switch (displayFormula.slice(-1)) {
+    const match = resultFormula.match(formulaHasOperator);
+    const nextValue = parseFloat(inputValue);
+    console.log(match);
+    let newCalValue = parseFloat(calValue);
+    if (match) {
+      switch (match[1]) {
         case "+":
           newCalValue += nextValue;
           break;
@@ -55,12 +57,22 @@ function App() {
         default:
           return newCalValue;
       }
-      console.log(newCalValue);
+
+      // get a result
+      if (oper === "=") {
+        setIsResult(true);
+        handleFormula(`=${newCalValue}`);
+        handleResultFormula(`=${newCalValue}`);
+      } else {
+        handleFormula(oper);
+        handleResultFormula(newCalValue, oper, true);
+      }
       setCalValue(newCalValue);
     } else {
-      let newDisplayFormula = displayFormula;
-      newDisplayFormula += oper;
-      setDisplayFormula(newDisplayFormula);
+      newCalValue = inputValue;
+      setCalValue(newCalValue);
+      handleFormula(oper);
+      handleResultFormula(oper);
     }
     handleClearInput();
   }
@@ -76,6 +88,7 @@ function App() {
     }
     handleFormula(newInputValue);
     setInputValue(newInputValue);
+    handleResultFormula(newInputValue);
   }
 
   // update formula with the new added numbers or operators
@@ -83,16 +96,25 @@ function App() {
     let newFormula = displayFormula;
     if (newFormula === "0") {
       newFormula = numOrOper;
+    } else if (numOrOper.startsWith("=")) {
+      newFormula += numOrOper;
     } else {
       newFormula = newFormula + numOrOper.slice(-1);
     }
     setDisplayFormula(newFormula);
   }
 
-  const handleEqual = (event) => {
-    event.preventDefault();
-    setIsResult(true);
-    handleFormula(`=${calValue}`);
+  const handleResultFormula = (numOrOper, oper = null, isCalValue = false) => {
+    let newResultFormula = resultFormula;
+    if (isCalValue) {
+      newResultFormula = numOrOper + oper;
+    } else if (numOrOper.startsWith("=")) {
+      newResultFormula += numOrOper;
+    } else {
+      newResultFormula += numOrOper.slice(-1);
+    }
+    console.log(newResultFormula);
+    setResultFormula(newResultFormula);
   }
 
   const handleClearInput = () => {
@@ -102,6 +124,7 @@ function App() {
   const handleClear = (event) => {
     event.preventDefault();
     setDisplayFormula("0");
+    setResultFormula("");
     setInputValue("0");
     setCalValue(0);
     setIsResult(false);
@@ -118,7 +141,7 @@ function App() {
       <div>
         <button 
           id="equals" 
-          onClick = {handleEqual}
+          onClick = {(event) => handleCalculation(event, "=")}
         > 
           =
         </button>
