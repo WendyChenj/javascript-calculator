@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 
 import { numbers, operators } from './utils';
 import './App.css';
@@ -181,30 +181,39 @@ function App() {
 
   return (
     <div className="App">
-      <div id="display">
-        { isResult ? calValue: inputValue}
-      </div>
+
       <div id="formula">
         {displayFormula}
       </div>
-      <div>
+      <div id="display">
+        { isResult ? calValue: inputValue}
+      </div>
+
+      <div className="buttonWrapper">
+        <button 
+          id="clear" 
+          onClick={handleClear}
+        >
+          C
+        </button>
+
         <button 
           id="equals" 
           onClick = {(event) => handleCalculation(event, "=")}
         > 
           =
         </button>
-      </div>
-      <div className="numButtons"> 
+      
         { numbers.map( num => 
           <button 
             id={num.id}
             onClick = {(event) => handleInput(event, num.number)}
           > 
             {num.number} 
-          </button>)}
-      </div>
-      <div className="operButtons">
+          </button> )
+        }
+
+
         { operators.map( oper => 
           <button 
             id={oper.id}
@@ -213,17 +222,14 @@ function App() {
             {oper.operation}
           </button>)
         }
-      </div>
-      <div>
+
         <button 
           id="decimal" 
           onClick={handleDecimal}
         >
           .
         </button>
-      </div>
-      <div>
-        <button id="clear" onClick={handleClear}>C</button>
+      
       </div>
     </div>
   );
