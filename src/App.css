@@ -1,38 +1,147 @@
+body {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+}
+
 .App {
-  text-align: center;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 200px;
+  width: 320px;
+  height: 500px;
+  border: 4px solid #242423;
+  border-radius: 5px;
+  text-align: right;
+  background-color: #333533;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+div#formula {
+  padding-top: 32px;
+  padding-bottom: 16px;
+  /* height: 50px; */
+  width: 100%;
+  color: #f5cb5c;
+  font-size: 1.5rem;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
+div#display {
+  width: 100%;
   color: white;
+  margin-bottom: 16px;
+  font-size: 2.5rem;
 }
 
-.App-link {
-  color: #61dafb;
+.buttonWrapper {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  grid-template-rows: 72px 72px 72px 72px 72px;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+button {
+  color: white;
+  background-color: #595959;
+  font-size: 1.75rem;
+}
+
+button:hover {
+  border: none;
+  background-color: #7f7f7f;
+}
+
+button#clear {
+  grid-column: 1 / 3;
+  grid-row: 1 / 2;
+}
+
+button#equals {
+  grid-column: 3 / 5;
+  grid-row: 1 / 2;
+}
+
+button#zero {
+  grid-row: 5 / 6;
+  grid-column: 1 / 3;
+}
+
+button#decimal {
+  grid-row: 5 / 6;
+  grid-column: 3 / 4;
+}
+
+button#one {
+  grid-row: 4 / 5;
+  grid-column: 1 / 2;
+}
+
+button#two {
+  grid-row: 4 / 5;
+  grid-column: 2 / 3;
+}
+
+button#three {
+  grid-row: 4 / 5;
+  grid-column: 3 / 4;
+}
+
+button#four {
+  grid-row: 3 / 4;
+  grid-column: 1 / 2;
+}
+
+button#five {
+  grid-row: 3 / 4;
+  grid-column: 2 / 3;
+}
+
+button#six {
+  grid-row: 3 / 4;
+  grid-column: 3 / 4;
+}
+
+button#seven {
+  grid-row: 2 / 3;
+  grid-column: 1 / 2;
+}
+
+button#eight {
+  grid-row: 2 / 3;
+  grid-column: 2 / 3;
+}
+
+button#nine {
+  grid-row: 2 / 3;
+  grid-column: 3 / 4;
+}
+
+button#add {
+  grid-row: 2 / 3;
+  grid-column: 4 / 5;
+  background-color: #f1a92d;
+}
+
+button#subtract {
+  grid-row: 3 / 4;
+  grid-column: 4 / 5;
+  background-color: #f1a92d;
+}
+
+button#multiply {
+  grid-row: 4 / 5;
+  grid-column: 4 / 5;
+  background-color: #f1a92d;
+}
+
+button#divide {
+  grid-row: 5 / 6;
+  grid-column: 4 / 5;
+  background-color: #f1a92d;
+}
+
+button#add:hover,
+button#subtract:hover,
+button#multiply:hover,
+button#divide:hover {
+  background-color: #f5cb5c;
 }
