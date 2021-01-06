@@ -21,3 +21,5 @@ Given basic HTML and CSS files, use front end library React to create a javascri
 ### DEMO:
 
 See it live: https://wendychenj.github.io/javascript-calculator/
+
+@ Happy Coding - Wendy
